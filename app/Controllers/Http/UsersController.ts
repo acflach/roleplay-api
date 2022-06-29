@@ -2,14 +2,11 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BadRequestException from 'App/Exceptions/BadRequestException'
 import User from 'App/Models/User'
 import CreateUserValidator from 'App/Validators/CreateUserValidator'
+import UpdateUserValidator from 'App/Validators/UpdateUserValidator'
 
 export default class UsersController {
   public async store({ request, response }: HttpContextContract) {
     const userPayload = await request.validate(CreateUserValidator)
-
-    // if (!userPayload.email || !userPayload.username || !userPayload.password) {
-    //   throw new BadRequestException('required data not provided', 422)
-    // }
 
     const userByEmail = await User.findBy('email', userPayload.email)
     if (userByEmail) throw new BadRequestException('e-mail already in use', 409)
@@ -19,5 +16,19 @@ export default class UsersController {
 
     const user = await User.create(userPayload)
     return response.created({ user })
+  }
+
+  public async update({ request, response }: HttpContextContract) {
+    const { email, password, avatar } = await request.validate(UpdateUserValidator)
+
+    const id = request.param('id')
+    const user = await User.findByOrFail('id', id)
+
+    user.email = email
+    user.password = password
+    if (avatar) user.avatar = avatar
+    await user.save()
+
+    return response.ok({ user })
   }
 }

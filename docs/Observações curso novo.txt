@@ -1,7 +1,0 @@
-Extensões sugeridas:
-
-EditorConfig (junto com ESLint e Prettier?)
-vsc-organize-imports
-Auto Import
-
-Não encontrei euivalente para o only na versão nova do Japa . . .
